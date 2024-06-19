@@ -1,7 +1,25 @@
 #!/usr/bin/env bash
-# 1. Выполнять из-под рута
 
-sudo su
+if ! [ $(id -u) = 0 ]; then
+   echo "The script need to be run as root." >&2
+   exit 1
+fi
+
+if [ $SUDO_USER ]; then
+    real_user=$SUDO_USER
+else
+    real_user=$(whoami)
+fi
+
+# Commands that you don't want running as root would be invoked
+# with: sudo -u $real_user
+# So they will be run as the user who invoked the sudo command
+# Keep in mind if the user is using a root shell (they're logged in as root),
+# then $real_user is actually root
+# sudo -u $real_user non-root-command
+
+# Commands that need to be ran with root would be invoked without sudo
+# root-command
 
 export DEBIAN_MIRROR="http://en.archive.ubuntu.com"
 export DEBIAN_VERSION="noble"
@@ -91,37 +109,13 @@ apt-get install -y bash-completion bsdmainutils psmisc uuid-runtime \
 apt autoremove
 apt-get clean all
 
-logout
+mkdir /opt/desktop_scripts
+curl -L https://github.com/bayrell-os/desktop_scripts/raw/main/screenshot.sh > /opt/desktop_scripts/screenshot.sh
+curl -L https://github.com/bayrell-os/desktop_scripts/raw/main/brightness.sh > /opt/desktop_scripts/brightness.sh
+
+echo "user ALL = NOPASSWD: /opt/desktop_scripts/brightness.sh" | tee /etc/sudoers.d/brightness
+
 
 # 2. Выполнять из-под пользователя
 
-cat >> ~/.bashrc <<\EOF
-source /etc/bash_completion.d/git-prompt
-PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u\[\033[00m\]:\[\033[01;34m\]\w\[\033[00;32m\]`__git_ps1`\[\033[0m\]\n$ '
-PROMPT_COMMAND='echo -n [$(date +%k:%M:%S)]\ '
-EOF
-
-cd /tmp
-git clone https://github.com/prostopasta/dot-vim.git
-cd dot-vim/ && bash install.sh
-
-mkdir ~/.config/kitty
-curl -L https://github.com/bayrell-os/lxqt_home/raw/main/src/.config/kitty/kitty.conf > ~/.config/kitty/kitty.conf
-
-mkdir ~/.config/openbox
-curl -L https://github.com/bayrell-os/lxqt_home/raw/main/src/.config/openbox/rc.xml > ~/.config/openbox/rc.xml
-
-mkdir ~/.config/featherpad
-curl -L https://github.com/bayrell-os/lxqt_home/raw/main/src/.config/featherpad/fp.conf > ~/.config/featherpad/fp.conf
-
-curl -L https://github.com/bayrell-os/lxqt_home/raw/main/src/.config/picom.conf > ~/.config/picom.conf
-
-curl -L https://github.com/bayrell-os/lxqt_home/raw/main/src/.config/lxqt/panel.conf > ~/.config/lxqt/panel.conf
-
-curl -L https://github.com/bayrell-os/lxqt_home/raw/main/src/.config/spectaclerc > ~/.config/spectaclerc
-
-sudo mkdir /opt/desktop_scripts
-sudo curl -L https://github.com/bayrell-os/desktop_scripts/raw/main/screenshot.sh > /opt/desktop_scripts/screenshot.sh
-sudo curl -L https://github.com/bayrell-os/desktop_scripts/raw/main/brightness.sh > /opt/desktop_scripts/brightness.sh
-
-echo "user ALL = NOPASSWD: /opt/desktop_scripts/brightness.sh" | sudo tee /etc/sudoers.d/brightness
+sudo -u $real_user ./user_setup.sh
