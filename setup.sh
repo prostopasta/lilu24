@@ -83,7 +83,7 @@ EOF
 apt-get update
 apt-get install -y google-chrome-stable 
 
-apt-get install flatpak
+apt-get install -y flatpak
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
 apt install -y ubuntu-drivers-common
