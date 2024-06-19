@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 1. Выполнять из-под рута
 
-sudo -i
+sudo su
 
 export DEBIAN_MIRROR="http://en.archive.ubuntu.com"
 export DEBIAN_VERSION="noble"
