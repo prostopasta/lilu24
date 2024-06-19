@@ -45,15 +45,9 @@ export LANG
 export LANGUAGE
 EOF
 
-cat > /etc/profile.d/0.welcome.sh <<\EOF
-HOSTNAME=`hostname`
-if [[ `whoami` = "root" ]]; then
-    HILIT="\e[0;91m"
-else
-    HILIT="\e[0;94m"
-fi
-PS1="\[${HILIT}\][\u@${HOSTNAME} \W]\\$ \[\e[0m\]"
-export PS1
+cat >> /root/.bashrc <<\EOF
+PS1='${debian_chroot:+($debian_chroot)}\[\e[0;91m\]\u@\h \W\\$ \[\e[0m\]'
+#PS1='${debian_chroot:+($debian_chroot)}\[\e[0;91m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 EOF
 
 echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
