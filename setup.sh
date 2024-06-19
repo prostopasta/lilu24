@@ -65,8 +65,9 @@ EOF
 
 cat >> /etc/inputrc << EOF
 set enable-bracketed-paste off
+EOF
 
-cat >> /etc/default/keyboard <<\EOF
+cat > /etc/default/keyboard <<\EOF
 # KEYBOARD CONFIGURATION FILE
 # Consult the keyboard(5) manual page.
 XKBMODEL="pc105"
