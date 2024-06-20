@@ -209,6 +209,39 @@ sed -i 's/^.\?GRUB_DISTRIBUTOR=.*/GRUB_DISTRIBUTOR="LiveUSB Lubuntu 24"/g' /etc/
 sed -i 's/^.\?GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="splash quiet acpi_backlight=none scsi_mod.use_blk_mq=1"/g' /etc/default/grub
 update-grub
 
+# Настройка iptables
+cat > /etc/iptables/rules.v4 <<\EOF
+*filter
+:INPUT ACCEPT [19:913]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [39:3584]
+:ALLOW-INPUT - [0:0]
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+
+# Разрешаем входящие соединения ssh
+#-A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+
+# Разрешить http
+#-A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+#-A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+
+# Перейти к цепочке ALLOW-INPUT
+-A INPUT -j ALLOW-INPUT
+
+# Запрещаем остальные входящие соединения
+-A INPUT -j REJECT
+-A FORWARD -j REJECT
+
+-A ALLOW-INPUT -j RETURN
+
+COMMIT
+EOF
+
+# Скопируем rules.v4 в rules.v6
+cp -f /etc/iptables/rules.v4 /etc/iptables/rules.v6
+
 # 2. Выполнять из-под пользователя
 
 sudo -u "$real_user" ./user_setup.sh
