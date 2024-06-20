@@ -6,8 +6,7 @@ PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u\[\033[00m\]:\[\033[01;3
 PROMPT_COMMAND='echo -n [$(date +%k:%M:%S)]\ '
 EOF
 
-cd /tmp
-git clone https://github.com/prostopasta/dot-vim.git
+cd /tmp && git clone https://github.com/prostopasta/dot-vim.git
 cd dot-vim/ && bash install.sh
 
 mkdir ~/.config/kitty
@@ -19,7 +18,7 @@ curl -L https://github.com/bayrell-os/lxqt_home/raw/main/src/.config/openbox/rc.
 mkdir ~/.config/featherpad
 curl -L https://github.com/bayrell-os/lxqt_home/raw/main/src/.config/featherpad/fp.conf > ~/.config/featherpad/fp.conf
 
-curl -L https://github.com/bayrell-os/lxqt_home/raw/main/src/.config/picom.conf > ~/.config/picom.conf
+#curl -L https://github.com/bayrell-os/lxqt_home/raw/main/src/.config/picom.conf > ~/.config/picom.conf
 
 curl -L https://github.com/bayrell-os/lxqt_home/raw/main/src/.config/lxqt/panel.conf > ~/.config/lxqt/panel.conf
 
