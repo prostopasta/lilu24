@@ -103,8 +103,7 @@ apt-get install -y bash-completion bsdmainutils psmisc uuid-runtime \
 
 apt purge -y okular okular-extra-backends apparmor ifupdown resolvconf \
   geoclue-2.0 modemmanager xfwm4 xfwm4-theme-breeze obconf connman cmst \
-  xscreensaver gnome-keyring gnome-power-manager gnome-session-bin \
-  smplayer
+  xscreensaver gnome-power-manager gnome-session-bin smplayer
 apt -y autoremove
 apt-get clean all
 
@@ -251,6 +250,56 @@ vfat_defaults=uid=$UID,gid=$GID,shortname=mixed,utf8=1,showexec,flush,sync
 ntfs_defaults=uid=$UID,gid=$GID,windows_names,sync,relatime
 ntfs:ntfs3_defaults=uid=$UID,gid=$GID,windows_names,sync,relatime
 EOF
+
+# Установка gnome screensaver
+cat > /etc/xdg/autostart/lxqt-gnome-screensaver.desktop <<\EOF
+[Desktop Entry]
+Comment=Screensaver
+Exec=gnome-screensaver
+GenericName=GNOME Screensaver
+Name=GNOME Screensaver
+OnlyShowIn=LXQt;
+TryExec=gnome-screensaver
+Type=Application
+EOF
+
+# Установка picom
+cat > /etc/xdg/autostart/lxqt-picom.desktop <<\EOF
+[Desktop Entry]
+Comment=A X compositor
+Exec=picom --backend glx --vsync
+GenericName=X compositor
+Name=Picom (X Compositor)
+OnlyShowIn=LXQt;
+TryExec=compton
+Type=Application
+EOF
+
+# Настройка монитора
+cat > /etc/xdg/autostart/lxqt-monitor.desktop << EOF
+[Desktop Entry]
+Comment=Monitor Settings
+Exec=sh -c 'sleep 60 && xset dpms 200 200 200 && xset -dpms && xset s off && xset dpms 300 300 300'
+GenericName=Monitor Always ON
+Name=Monitor Always ON
+OnlyShowIn=LXQt;
+Type=Application
+EOF
+
+# Настройка pulseaudio
+cat > /etc/pulse/default.pa.d/pulse-socket.pa <<\EOF
+load-module module-native-protocol-unix auth-anonymous=1 socket=/tmp/pulse-socket
+EOF
+
+# Отключение автообновлений
+sed -i.bak 's/^.\?APT\:\:Periodic\:\:Unattended-Upgrade.*/APT\:\:Periodic\:\:Unattended-Upgrade "0";/g' /etc/apt/apt.conf.d/20auto-upgrades
+systemctl stop unattended-upgrades
+systemctl disable unattended-upgrades
+
+# Установим лимиты на размер journalctl и время ожидания запуска сервисов
+echo "SystemMaxUse=128M" >> /etc/systemd/journald.conf
+echo "DefaultTimeoutStartSec=60" >> /etc/systemd/system.conf
+echo "DefaultTimeoutStopSec=30" >> /etc/systemd/system.conf
 
 # 2. Выполнять из-под пользователя
 
