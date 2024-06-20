@@ -242,6 +242,16 @@ EOF
 # Скопируем rules.v4 в rules.v6
 cp -f /etc/iptables/rules.v4 /etc/iptables/rules.v6
 
+# Настройка udisks2
+# udisks2 отвечает за подключение флешек и разных устройств. 
+# Рекомендуется добавить параметр sync для более корректной работы с USB устройствами
+cat > /etc/udisks2/mount_options.conf <<\EOF
+[defaults]
+vfat_defaults=uid=$UID,gid=$GID,shortname=mixed,utf8=1,showexec,flush,sync
+ntfs_defaults=uid=$UID,gid=$GID,windows_names,sync,relatime
+ntfs:ntfs3_defaults=uid=$UID,gid=$GID,windows_names,sync,relatime
+EOF
+
 # 2. Выполнять из-под пользователя
 
 sudo -u "$real_user" ./user_setup.sh
