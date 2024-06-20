@@ -131,10 +131,15 @@ EOF
 
 echo "nameserver 127.0.0.1" > /etc/resolv.conf
 
+systemctl stop systemd-networkd.socket
 systemctl disable systemd-networkd.socket
+systemctl stop systemd-networkd.service
 systemctl disable systemd-networkd.service
+systemctl stop systemd-networkd.service
 systemctl disable systemd-resolved.service
+systemctl stop avahi-daemon.service
 systemctl disable avahi-daemon.service
+systemctl stop avahi-daemon.socket
 systemctl disable avahi-daemon.socket
 
 # Настройка dnsmasq
@@ -217,10 +222,13 @@ cat > /etc/iptables/rules.v4 <<\EOF
 :ALLOW-INPUT - [0:0]
 -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 -A INPUT -p icmp -j ACCEPT
+
+# Allow all loopback (lo0) traffic and drop all traffic to 127/8 that doesn't use lo0
 -A INPUT -i lo -j ACCEPT
+-A INPUT -d 127.0.0.0/8 -j REJECT
 
 # Разрешаем входящие соединения ssh
-#-A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
 
 # Разрешить http
 #-A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
