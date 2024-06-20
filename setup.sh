@@ -138,6 +138,7 @@ systemctl disable systemd-resolved.service
 systemctl disable avahi-daemon.service
 systemctl disable avahi-daemon.socket
 
+# Настройка dnsmasq
 cat > /etc/dnsmasq.conf <<\EOF
 port=53
 #listen-address=0.0.0.0
@@ -167,6 +168,29 @@ domain-needed
 # Для отладки
 #log-queries
 EOF
+
+sed -i 's/#IGNORE_RESOLVCONF=yes/IGNORE_RESOLVCONF=yes/g' /etc/default/dnsmasq
+
+# Выключаем резолвер из внешней сети интернет
+cat > /etc/dnsmasq.d/disable-external-network <<\EOF
+bind-interfaces
+except-interface=eth*
+except-interface=enp*
+except-interface=wlan*
+except-interface=wlp*
+EOF
+
+# Рестарт dnsmasq при включении/отключении сети
+cat > /etc/dnsmasq.d/disable-external-network <<\EOF
+#!/bin/bash
+
+if [[ "$2" = "up" || "$2" = "down" ]]; then
+    kill -9 `cat /var/run/dnsmasq/dnsmasq.pid`
+    sleep 2
+    systemctl start dnsmasq
+fi
+EOF
+
 
 # 2. Выполнять из-под пользователя
 
