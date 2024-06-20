@@ -23,3 +23,10 @@ curl -L https://github.com/bayrell-os/lxqt_home/raw/main/src/.config/featherpad/
 curl -L https://github.com/bayrell-os/lxqt_home/raw/main/src/.config/lxqt/panel.conf > ~/.config/lxqt/panel.conf
 
 curl -L https://github.com/bayrell-os/lxqt_home/raw/main/src/.config/spectaclerc > ~/.config/spectaclerc
+
+# Настройка Flatpak
+# Чтобы курсор во Flatpak приложениях был одинаковым
+flatpak override --user --filesystem=$HOME/.icons/:ro
+flatpak override --user --filesystem=/usr/share/icons/:ro
+flatpak override --user --filesystem=xdg-config/gtk-3.0:ro
+flatpak override --user --env GTK_USE_PORTAL=1
