@@ -173,7 +173,7 @@ domain-needed
 #log-queries
 EOF
 
-sed -i 's/#IGNORE_RESOLVCONF=yes/IGNORE_RESOLVCONF=yes/g' /etc/default/dnsmasq
+sed -i.bak 's/^.\?IGNORE_RESOLVCONF=.*/IGNORE_RESOLVCONF=yes/g' /etc/default/dnsmasq
 
 # Выключаем резолвер из внешней сети интернет
 cat > /etc/dnsmasq.d/disable-external-network <<\EOF
@@ -196,6 +196,8 @@ fi
 EOF
 
 # Настройка синхронизации времени
+apt install -y systemd-timesyncd
+timedatectl set-ntp true
 mv -f /etc/openntpd/ntpd.conf /etc/openntpd/ntpd.orig.conf
 echo "servers pool.ntp.org" > /etc/openntpd/ntpd.conf
 
