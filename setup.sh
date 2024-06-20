@@ -191,6 +191,23 @@ if [[ "$2" = "up" || "$2" = "down" ]]; then
 fi
 EOF
 
+# Настройка синхронизации времени
+mv -f /etc/openntpd/ntpd.conf /etc/openntpd/ntpd.orig.conf
+echo "servers pool.ntp.org" > /etc/openntpd/ntpd.conf
+
+# Установим BFQ
+# BFQ это диспетчер I/O. Это улучшенная версия, которая позволяет ускорить работу с системой
+echo 'bfq' >> /etc/initramfs-tools/modules
+echo 'ACTION=="add|change", KERNEL=="sd*[!0-9]|sr*", ATTR{queue/scheduler}="bfq"' >> /etc/udev/rules.d/60-scheduler.rules
+update-initramfs -u
+
+# Настройка GRUB
+sed -i.bak 's/^.\?GRUB_TIMEOUT_STYLE=.*/GRUB_TIMEOUT_STYLE=menu/g' /etc/default/grub
+sed -i 's/^.\?GRUB_TIMEOUT=.*/GRUB_TIMEOUT=5/g' /etc/default/grub
+sed -i 's/^.\?GRUB_DISABLE_OS_PROBER=.*/GRUB_DISABLE_OS_PROBER=true/g' /etc/default/grub
+sed -i 's/^.\?GRUB_DISTRIBUTOR=.*/GRUB_DISTRIBUTOR="LiveUSB Lubuntu 24"/g' /etc/default/grub
+sed -i 's/^.\?GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="splash quiet acpi_backlight=none scsi_mod.use_blk_mq=1"/g' /etc/default/grub
+update-grub
 
 # 2. Выполнять из-под пользователя
 
