@@ -277,7 +277,8 @@ EOF
 cat > /etc/xdg/autostart/lxqt-picom.desktop <<\EOF
 [Desktop Entry]
 Comment=A X compositor
-Exec=picom --backend glx --vsync
+#Exec=picom --backend glx --vsync
+Exec=picom --backend glx
 GenericName=X compositor
 Name=Picom (X Compositor)
 OnlyShowIn=LXQt;
