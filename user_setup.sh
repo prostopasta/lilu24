@@ -19,6 +19,8 @@ mkdir ~/.config/featherpad
 curl -L https://github.com/bayrell-os/lxqt_home/raw/main/src/.config/featherpad/fp.conf > ~/.config/featherpad/fp.conf
 
 #curl -L https://github.com/bayrell-os/lxqt_home/raw/main/src/.config/picom.conf > ~/.config/picom.conf
+#sed -i.bak 's/^vsync =.*/vsync = false;/g' ~/.config/picom.conf
+#sed -i 's/^backend = .*/#&/g' ~/.config/picom.conf
 
 curl -L https://github.com/bayrell-os/lxqt_home/raw/main/src/.config/lxqt/panel.conf > ~/.config/lxqt/panel.conf
 
