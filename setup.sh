@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-if ! [ $(id -u) = 0 ]; then
+if ! [ "$(id -u)" = 0 ]; then
    echo "The script need to be run as root." >&2
    exit 1
 fi
 
-if [ $SUDO_USER ]; then
+if [ "$SUDO_USER" ]; then
     real_user=$SUDO_USER
 else
     real_user=$(whoami)
@@ -76,7 +76,7 @@ deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main
 EOF
 
 apt-get update
-apt-get install -y google-chrome-stable 
+apt-get install -y google-chrome-stable
 
 apt-get install -y flatpak
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
@@ -99,18 +99,75 @@ apt-get install -y bash-completion bsdmainutils psmisc uuid-runtime \
   scrot software-properties-gtk kcalc konsole dolphin dconf-editor \
   gnome-screensaver fonts-noto-core fonts-dejavu fonts-freefont-ttf \
   xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-kde \
-  font-manager kitty kcolorchooser vlc ark git
-  
-apt autoremove
+  font-manager kitty kcolorchooser vlc ark featherpad git
+
+apt purge -y okular okular-extra-backends apparmor ifupdown resolvconf \
+  geoclue-2.0 modemmanager xfwm4 xfwm4-theme-breeze obconf connman cmst \
+  xscreensaver gnome-keyring gnome-power-manager gnome-session-bin \
+  smplayer
+apt -y autoremove
 apt-get clean all
 
 mkdir /opt/desktop_scripts
 curl -L https://github.com/bayrell-os/desktop_scripts/raw/main/screenshot.sh > /opt/desktop_scripts/screenshot.sh
 curl -L https://github.com/bayrell-os/desktop_scripts/raw/main/brightness.sh > /opt/desktop_scripts/brightness.sh
+chmod +x /opt/desktop_scripts/*.sh
 
 echo "user ALL = NOPASSWD: /opt/desktop_scripts/brightness.sh" | tee /etc/sudoers.d/brightness
 
+cat > /etc/NetworkManager/NetworkManager.conf <<\EOF
+[main]
+plugins=ifupdown,keyfile
+dns=none
+
+[ifupdown]
+managed=false
+
+[device]
+wifi.scan-rand-mac-address=no
+
+[keyfile]
+unmanaged-devices=*,except:type:ethernet,except:type:wifi,except:type:gsm,except:type:cdma,interface-name:lxc*,interface-name:docker*,interface-name:virtual*,interface-name:veth*
+EOF
+
+echo "nameserver 127.0.0.1" > /etc/resolv.conf
+
+systemctl disable systemd-networkd.socket
+systemctl disable systemd-networkd.service
+systemctl disable systemd-resolved.service
+systemctl disable avahi-daemon.service
+systemctl disable avahi-daemon.socket
+
+cat > /etc/dnsmasq.conf <<\EOF
+port=53
+#listen-address=0.0.0.0
+no-dhcp-interface=
+bind-interfaces
+expand-hosts
+local-ttl=1
+no-negcache
+
+# Динамические настройки DNS
+resolv-file=/run/NetworkManager/resolv.conf
+
+# Настройки DNS по умолчанию
+#resolv-file=/etc/resolv.dnsmasq
+
+conf-dir=/etc/dnsmasq.d
+cache-size=150
+max-cache-ttl=600
+min-cache-ttl=60
+
+# Одновременный запрос ко всем DNS серверам
+# all-servers
+
+# Запрещаем резолвить домены без точки (нужно для Docker Swarm)
+domain-needed
+
+# Для отладки
+#log-queries
+EOF
 
 # 2. Выполнять из-под пользователя
 
-sudo -u $real_user ./user_setup.sh
+sudo -u "$real_user" ./user_setup.sh
