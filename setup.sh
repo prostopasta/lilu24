@@ -185,7 +185,7 @@ except-interface=wlp*
 EOF
 
 # Рестарт dnsmasq при включении/отключении сети
-cat > /etc/dnsmasq.d/disable-external-network <<\EOF
+cat > /etc/NetworkManager/dispatcher.d/99-dnsmasq <<\EOF
 #!/bin/bash
 
 if [[ "$2" = "up" || "$2" = "down" ]]; then
