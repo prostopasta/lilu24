@@ -312,6 +312,16 @@ echo "SystemMaxUse=128M" >> /etc/systemd/journald.conf
 echo "DefaultTimeoutStartSec=60" >> /etc/systemd/system.conf
 echo "DefaultTimeoutStopSec=30" >> /etc/systemd/system.conf
 
+# Установим VSCode
+apt install -y wget gpg
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
+echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" |sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
+rm -f packages.microsoft.gpg
+apt install -y apt-transport-https
+apt update -y
+apt install -y code
+
 # 2. Выполнять из-под пользователя
 
 sudo -u "$real_user" ./user_setup.sh
