@@ -109,10 +109,10 @@ apt-get clean all
 
 mkdir /opt/desktop_scripts
 curl -L https://github.com/bayrell-os/desktop_scripts/raw/main/screenshot.sh > /opt/desktop_scripts/screenshot.sh
-curl -L https://github.com/bayrell-os/desktop_scripts/raw/main/brightness.sh > /opt/desktop_scripts/brightness.sh
+#curl -L https://github.com/bayrell-os/desktop_scripts/raw/main/brightness.sh > /opt/desktop_scripts/brightness.sh
 chmod +x /opt/desktop_scripts/*.sh
 
-echo "user ALL = NOPASSWD: /opt/desktop_scripts/brightness.sh" | tee /etc/sudoers.d/brightness
+#echo "user ALL = NOPASSWD: /opt/desktop_scripts/brightness.sh" | tee /etc/sudoers.d/brightness
 
 cat > /etc/NetworkManager/NetworkManager.conf <<\EOF
 [main]
@@ -252,7 +252,7 @@ EOF
 cp -f /etc/iptables/rules.v4 /etc/iptables/rules.v6
 
 # Настройка udisks2
-# udisks2 отвечает за подключение флешек и разных устройств. 
+# udisks2 отвечает за подключение флешек и разных устройств.
 # Рекомендуется добавить параметр sync для более корректной работы с USB устройствами
 cat > /etc/udisks2/mount_options.conf <<\EOF
 [defaults]
@@ -295,11 +295,6 @@ GenericName=Monitor Always ON
 Name=Monitor Always ON
 OnlyShowIn=LXQt;
 Type=Application
-EOF
-
-# Настройка pulseaudio
-cat > /etc/pulse/default.pa.d/pulse-socket.pa <<\EOF
-load-module module-native-protocol-unix auth-anonymous=1 socket=/tmp/pulse-socket
 EOF
 
 # Отключение автообновлений
