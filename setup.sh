@@ -99,7 +99,7 @@ apt-get install -y bash-completion bsdmainutils psmisc uuid-runtime \
   scrot software-properties-gtk kcalc konsole dolphin dconf-editor \
   gnome-screensaver fonts-noto-core fonts-dejavu fonts-freefont-ttf \
   xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-kde \
-  font-manager kitty kcolorchooser vlc ark featherpad git seahorse
+  font-manager kitty kcolorchooser vlc ark featherpad git seahorse wireguard
 
 apt purge -y okular okular-extra-backends apparmor ifupdown resolvconf \
   geoclue-2.0 modemmanager xfwm4 xfwm4-theme-breeze obconf connman cmst \
@@ -205,7 +205,7 @@ plugins=ifupdown,keyfile
 dns=none
 
 [ifupdown]
-managed=false
+managed=true
 
 [device]
 wifi.scan-rand-mac-address=no
