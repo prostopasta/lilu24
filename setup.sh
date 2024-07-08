@@ -182,6 +182,7 @@ except-interface=eth*
 except-interface=enp*
 except-interface=wlan*
 except-interface=wlp*
+except-interface=wg*
 EOF
 
 # Рестарт dnsmasq при включении/отключении сети
@@ -193,6 +194,29 @@ if [[ "$2" = "up" || "$2" = "down" ]]; then
     sleep 2
     systemctl start dnsmasq
 fi
+EOF
+
+chmod u+x /etc/NetworkManager/dispatcher.d/99-dnsmasq
+
+# Make sure Ethernet, Wifi, WireGuard all set as exception
+cat > /etc/NetworkManager/NetworkManager.conf <<\EOF
+[main]
+plugins=ifupdown,keyfile
+dns=none
+
+[ifupdown]
+managed=false
+
+[device]
+wifi.scan-rand-mac-address=no
+
+[keyfile]
+unmanaged-devices=*,except:type:ethernet,except:type:wifi,except:type:gsm,except:type:cdma,except:type:wireguard,interface-name:lxc*,interface-name:docker*,interface-name:virtual*,interface-name:veth*
+EOF
+
+cat > /usr/lib/NetworkManager/conf.d/10-globally-managed-devices.conf <<\EOF
+[keyfile]
+unmanaged-devices=*,except:type:wifi,except:type:gsm,except:type:cdma,except:type:ethernet,except:type:wireguard
 EOF
 
 # Настройка синхронизации времени
